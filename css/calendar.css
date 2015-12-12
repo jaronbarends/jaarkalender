@@ -1,0 +1,64 @@
+/*-- Start reset --*/
+	a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,button,canvas,caption,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,fieldset,figcaption,figure,footer,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,iframe,img,input,ins,kbd,label,legend,li,mark form,menu,nav,object,ol,option,output,p,pre,q,ruby,s,samp,section,select,small,span,strike,strong,sub,summary,sup,table,tbody,td,textarea,tfoot,th,thead,time,tr,tt,u,ul,var,video{margin:0;border:0;padding:0;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}blockquote,q{quotes:none}blockquote:after,blockquote:before,q:after,q:before{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+	button,input[type=checkbox],input[type=image],input[type=radio],input[type=submit],label{cursor:pointer}
+	strong{font-weight:700}
+	em{font-style:italic}
+	.fList{list-style:none}
+	sub, sup {font-size: 0.8em;vertical-align:sub;}
+	sup { vertical-align: super;}
+/*-- End reset --*/
+
+html {
+	font-size: 7px;
+}
+
+body {
+	font-family: 'arial narrow', 'helvetica narrow', sans-serif;
+	line-height: 1.8;
+	color: #999;
+}
+
+.calendar {
+
+}
+
+.month {
+	float: left;
+	margin-left: 1em;
+}
+
+.month:nth-child(7) {
+	clear: left;
+}
+
+.month:nth-child(n+7) {
+	margin-top: 15em;
+}
+
+.day {
+	border-bottom: 1px solid #ccc;
+}
+
+.vr,
+.zo {
+	border-color: #999;
+}
+
+.za,
+.zo {
+	color: #666;
+}
+
+.day__name,
+.day__nr {
+	width: 1.5em;
+	height: 2em;
+}
+
+.day__notes {
+	width: 15em;
+}
+
+.clone-src {
+	display: none;
+}
