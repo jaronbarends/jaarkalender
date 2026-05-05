@@ -14,8 +14,7 @@
    * @returns {undefined}
    */
   function init() {
-    // const year = prompt("Welk jaar?") || new Date().getFullYear();
-    const year = new Date().getFullYear();
+    const year = prompt("Welk jaar?") || new Date().getFullYear();
     renderCalender(Number(year));
   }
 
@@ -93,7 +92,7 @@
     const monthName = monthFormatter
       .format(dt)
       .replace(/^\w/, (c) => c.toUpperCase());
-    monthTable.querySelector("caption").textContent = monthName;
+    monthTable.querySelector(".month__name").textContent = monthName;
     const tbody = document.createElement("tbody");
     monthTable.appendChild(tbody);
     calendar.appendChild(monthTable);
