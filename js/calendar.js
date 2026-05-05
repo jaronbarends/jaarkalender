@@ -3,21 +3,8 @@
   const daySrc = document.querySelector("#clone-src .day");
   const calendar = document.querySelector("#calendar");
   let currMonthBody;
-  const monthNames = [
-    "Januari",
-    "Februari",
-    "Maart",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Augustus",
-    "September",
-    "Oktober",
-    "November",
-    "December",
-  ];
-  const dayNames = ["zo", "ma", "di", "wo", "do", "vr", "za"];
+  const monthFormatter = new Intl.DateTimeFormat('nl-NL', { month: 'long' });
+  const dayFormatter = new Intl.DateTimeFormat('nl-NL', { weekday: 'short' });
 
   document.addEventListener("DOMContentLoaded", init);
 
@@ -84,7 +71,7 @@
    */
   function renderDay(dt) {
     const day = daySrc.cloneNode(true);
-    const dayName = dayNames[dt.getDay()];
+    const dayName = dayFormatter.format(dt);
 
     day.classList.add(dayName);
     day.querySelector(".day__name").textContent = dayName;
@@ -98,7 +85,8 @@
    */
   function startNewMonth(dt) {
     const monthTable = monthSrc.cloneNode(true);
-    monthTable.querySelector("caption").textContent = monthNames[dt.getMonth()];
+    const monthName = monthFormatter.format(dt).replace(/^\w/, c => c.toUpperCase());
+    monthTable.querySelector("caption").textContent = monthName;
     const tbody = document.createElement("tbody");
     monthTable.appendChild(tbody);
     calendar.appendChild(monthTable);
