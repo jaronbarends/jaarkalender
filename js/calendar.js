@@ -3,8 +3,8 @@
   const daySrc = document.querySelector("#clone-src .day");
   const calendar = document.querySelector("#calendar");
   let currMonthBody;
-  const monthFormatter = new Intl.DateTimeFormat('nl-NL', { month: 'long' });
-  const dayFormatter = new Intl.DateTimeFormat('nl-NL', { weekday: 'short' });
+  const monthFormatter = new Intl.DateTimeFormat("nl-NL", { month: "long" });
+  const dayFormatter = new Intl.DateTimeFormat("nl-NL", { weekday: "short" });
 
   document.addEventListener("DOMContentLoaded", init);
 
@@ -24,34 +24,39 @@
    * @returns {undefined}
    */
   function renderCalender(year) {
-    const dt = new Date("jan 1, " + year);
-    let currMonth; // month we're rendering now
+    const halfYearMonthGroups = [
+      [0, 1, 2, 3, 4, 5],
+      [6, 7, 8, 9, 10, 11],
+    ];
 
-    while (dt.getFullYear() === year) {
-      const isSameMonth = dt.getMonth() === currMonth;
+    for (const halfYearMonths of halfYearMonthGroups) {
+      const monthsData = halfYearMonths.map((m) => getMonthsData(year, m));
+      const startDays = monthsData.map((data) => data.startDay);
+      const minStartDay = Math.min(...startDays);
+      monthsData.forEach((meta) => renderMonth(year, meta, minStartDay));
+    }
+  }
 
-      if (!isSameMonth) {
-        currMonth = dt.getMonth();
-        startNewMonth(dt); // end prev month and start next
-      }
+  /**
+   * @returns {{ month: number, startDay: number, dayCount: number }}
+   */
+  function getMonthsData(year, month) {
+    const startDay = (new Date(year, month, 1).getDay() + 6) % 7; // convert Sun=0 to Mon=0
+    const dayCount = new Date(year, month + 1, 0).getDate();
+    return { month, startDay, dayCount };
+  }
 
-      if (dt.getDate() === 1) {
-        const dayNr = dt.getDay();
-        let repeats = dayNr - 1;
-
-        if (repeats === -1) {
-          repeats = 6;
-        }
-
-        for (let i = 0; i < repeats; i++) {
-          addEmptyDay();
-        }
-      }
-
-      renderDay(dt);
-
-      // increment day
-      dt.setDate(dt.getDate() + 1);
+  /**
+   * render a single month
+   * @returns {undefined}
+   */
+  function renderMonth(year, { month, startDay, dayCount }, minStartDay) {
+    startNewMonth(new Date(year, month, 1));
+    for (let i = 0; i < startDay - minStartDay; i++) {
+      addEmptyDay();
+    }
+    for (let day = 1; day <= dayCount; day++) {
+      renderDay(new Date(year, month, day));
     }
   }
 
@@ -85,7 +90,9 @@
    */
   function startNewMonth(dt) {
     const monthTable = monthSrc.cloneNode(true);
-    const monthName = monthFormatter.format(dt).replace(/^\w/, c => c.toUpperCase());
+    const monthName = monthFormatter
+      .format(dt)
+      .replace(/^\w/, (c) => c.toUpperCase());
     monthTable.querySelector("caption").textContent = monthName;
     const tbody = document.createElement("tbody");
     monthTable.appendChild(tbody);
