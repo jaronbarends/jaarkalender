@@ -14,8 +14,12 @@
    * @returns {undefined}
    */
   function init() {
-    const year = prompt("Welk jaar?") || new Date().getFullYear();
-    renderCalender(Number(year));
+    const yearInput = prompt("Welk jaar?");
+    const parsedYear = parseInt(yearInput, 10);
+    const year = Number.isFinite(parsedYear)
+      ? parsedYear
+      : new Date().getFullYear();
+    renderCalender(year);
   }
 
   /**
