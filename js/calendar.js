@@ -1,105 +1,105 @@
-;(function($) {
+(function () {
+  const monthSrc = document.querySelector("#clone-src .month");
+  const daySrc = document.querySelector("#clone-src .day");
+  const calendar = document.querySelector("#calendar");
+  let currMonthBody;
+  const monthFormatter = new Intl.DateTimeFormat("nl-NL", { month: "long" });
+  const dayFormatter = new Intl.DateTimeFormat("nl-NL", { weekday: "short" });
 
-	var $sgMonthSrc = $('#clone-src').find('.month'),
-		$sgDaySrc = $('#clone-src').find('.day'),
-		$sgCalendar = $('#calendar'),
-		$sgCurrMonth,
-		sgMonthNames = ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'],
-		sgDayNames = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+  document.addEventListener("DOMContentLoaded", init);
 
+  /**
+   * Initialize the calendar
+   * @param {string} varname Description
+   * @returns {undefined}
+   */
+  function init() {
+    const yearInput = prompt("Welk jaar?");
+    const parsedYear = parseInt(yearInput, 10);
+    const year = Number.isFinite(parsedYear)
+      ? parsedYear
+      : new Date().getFullYear();
+    renderCalender(year);
+  }
 
+  /**
+   *
+   * @returns {undefined}
+   */
+  function renderCalender(year) {
+    const halfYearMonthGroups = [
+      [0, 1, 2, 3, 4, 5],
+      [6, 7, 8, 9, 10, 11],
+    ];
 
-	/**
-	* add empty days before 1st of month
-	* @returns {undefined}
-	*/
-	var addEmptyDay = function() {
-		var $day = $sgDaySrc.clone()
-			.addClass('empty')
-			.appendTo($sgCurrMonth);
-	};
-	
-	/**
-	* render a single day
-	* @returns {undefined}
-	*/
-	var renderDay = function(dt) {
-		// console.log(dt.getDay(), dt.getMonth());
-		// console.log(dt.toLocaleDateString());
-		// console.log(sgDayNames[dt.getDay()], dt.getDate());
-		var $day = $sgDaySrc.clone()
-			.appendTo($sgCurrMonth),
-			dayName = sgDayNames[dt.getDay()];
+    for (const halfYearMonths of halfYearMonthGroups) {
+      const monthsData = halfYearMonths.map((m) => getMonthsData(year, m));
+      const startDays = monthsData.map((data) => data.startDay);
+      const minStartDay = Math.min(...startDays);
+      monthsData.forEach((meta) => renderMonth(year, meta, minStartDay));
+    }
+  }
 
-		$day.addClass(dayName);
-		$day.find('.day__name').text(dayName);
-		$day.find('.day__nr').text(dt.getDate());
-	};
+  /**
+   * @returns {{ month: number, startDay: number, dayCount: number }}
+   */
+  function getMonthsData(year, month) {
+    const startDay = (new Date(year, month, 1).getDay() + 6) % 7; // convert Sun=0 to Mon=0
+    const dayCount = new Date(year, month + 1, 0).getDate();
+    return { month, startDay, dayCount };
+  }
 
+  /**
+   * render a single month
+   * @returns {undefined}
+   */
+  function renderMonth(year, { month, startDay, dayCount }, minStartDay) {
+    startNewMonth(new Date(year, month, 1));
+    for (let i = 0; i < startDay - minStartDay; i++) {
+      addEmptyDay();
+    }
+    for (let day = 1; day <= dayCount; day++) {
+      renderDay(new Date(year, month, day));
+    }
+  }
 
-	/**
-	* start new month
-	* @returns {undefined}
-	*/
-	var startNewMonth = function(dt) {
-		$sgCurrMonth = $sgMonthSrc.clone()
-			.find('caption')
-				.text(sgMonthNames[dt.getMonth()])
-			.end()
-			.appendTo($sgCalendar);
-	};
-	
-	
-	
+  /**
+   * add empty days before 1st of month
+   * @returns {undefined}
+   */
+  function addEmptyDay() {
+    const day = daySrc.cloneNode(true);
+    day.classList.add("empty");
+    currMonthBody.appendChild(day);
+  }
 
-	/**
-	* 
-	* @returns {undefined}
-	*/
-	var renderCalender = function(year) {
+  /**
+   * render a single day
+   * @returns {undefined}
+   */
+  function renderDay(dt) {
+    const day = daySrc.cloneNode(true);
+    const dayName = dayFormatter.format(dt);
 
-		var dt = new Date('jan 1, '+year),
-			currMonth;// month we're rendering now
+    day.classList.add(dayName);
+    day.querySelector(".day__name").textContent = dayName;
+    day.querySelector(".day__nr").textContent = dt.getDate();
+    currMonthBody.appendChild(day);
+  }
 
-		while (dt.getFullYear() === year) {
-			var isSameMonth = (dt.getMonth() === currMonth);
-
-			if (!isSameMonth) {
-				currMonth = dt.getMonth();
-				startNewMonth(dt);// end prev month and start next
-			}
-
-			if (dt.getDate() === 1) {
-				var dayNr = dt.getDay(),
-					repeats = dayNr-1;
-
-				if (repeats === -1) {
-					repeats = 6;
-				}
-
-				for (var i=0; i<repeats; i++) {
-					addEmptyDay();
-				}
-			}
-
-			renderDay(dt);
-
-			// increment day
-			dt.setDate(dt.getDate()+1);
-		}
-	};
-
-
-	
-	/**
-	* 
-	* @param {string} varname Description
-	* @returns {undefined}
-	*/
-	var init = function() {
-		renderCalender(2016);
-	};
-
-	$(document).ready(init);
-
-})(jQuery);
+  /**
+   * start new month
+   * @returns {undefined}
+   */
+  function startNewMonth(dt) {
+    const monthTable = monthSrc.cloneNode(true);
+    const monthName = monthFormatter
+      .format(dt)
+      .replace(/^\w/, (c) => c.toUpperCase());
+    monthTable.querySelector(".month__name").textContent = monthName;
+    const tbody = document.createElement("tbody");
+    monthTable.appendChild(tbody);
+    calendar.appendChild(monthTable);
+    currMonthBody = tbody;
+  }
+})();
